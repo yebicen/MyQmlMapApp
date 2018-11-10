@@ -25,6 +25,8 @@ import QtSensors 5.3
 import ArcGIS.AppFramework 1.0
 import ArcGIS.AppFramework.Controls 1.0
 import Esri.ArcGISRuntime 100.2
+import Esri.ArcGISRuntime.Toolkit.Controls 100.2
+import Esri.ArcGISRuntime.Toolkit.Dialogs 100.2
 
 import "controls" as Controls
 
@@ -39,6 +41,9 @@ App {
     property int baseFontSize : app.info.propertyValue("baseFontSize", 15 * scaleFactor) + (isSmallScreen ? 0 : 3)
     property bool isSmallScreen: (width || height) < units(400)
 
+    property Point calloutLocation
+    property real xCoor
+    property real yCoor
 
     Page{
         anchors.fill: parent
@@ -78,7 +83,37 @@ App {
                     }
                     compass: Compass {}
                 }
-            }
+
+
+                //! [show callout qml api snippet]
+                // initialize Callout
+                calloutData {
+                    imageUrl: "./assets/RedShinyPin.png"
+                    title: "Location"
+                    location: calloutLocation
+                    detail: "x: " + xCoor + " y: " + yCoor
+                }
+
+                Callout {
+                    id: callout
+                    calloutData: parent.calloutData
+                }
+                //! [show callout qml api snippet]
+
+                // display callout on mouseClicked
+                onMouseClicked: {
+                    if (callout.calloutVisible)
+                        callout.dismiss()
+                    else
+                    {
+                        calloutLocation = mouse.mapPoint;
+                        xCoor = mouse.mapPoint.x.toFixed(2);
+                        yCoor = mouse.mapPoint.y.toFixed(2);
+                        callout.accessoryButtonHidden = true;
+                        callout.showCallout();
+                    }
+                }
+            } //end of mapview
 
             Rectangle {
                 id: rect
