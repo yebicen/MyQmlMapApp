@@ -111,10 +111,55 @@ App {
                         yCoor = mouse.mapPoint.y.toFixed(2);
                         callout.accessoryButtonHidden = true;
                         callout.showCallout();
+                        attachmentWindow.visible = true;
                     }
                 }
             } //end of mapview
+            
+            
+            // weather report popout window
+            Rectangle {
+                id: attachmentWindow
+                anchors.centerIn: parent
+                height: 200 * scaleFactor
+                width: 250 * scaleFactor
+                visible: false
+                radius: 10
+                color: "lightgrey"
+                border.color: "darkgrey"
+                opacity: 0.90
+                clip: true
 
+                // accept mouse events so they do not propogate down to the map
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: mouse.accepted = true
+                    onWheel: wheel.accepted = true
+                }
+
+                Rectangle {
+                    id: titleText
+                    anchors {
+                        left: parent.left
+                        right: parent.right
+                        top: parent.top
+                    }
+                    height: 40 * scaleFactor
+                    color: "transparent"
+
+                    Text {
+                        anchors {
+                            verticalCenter: parent.verticalCenter
+                            left: parent.left
+                            margins: 10 * scaleFactor
+                        }
+
+                        text: "Weather"; font {bold: true; pixelSize: 20 * scaleFactor;}
+                    }
+
+                }
+                
+                
             Rectangle {
                 id: rect
                 anchors.fill: parent
