@@ -15,12 +15,16 @@
  */
 
 import QtQuick 2.7
+
+
 import QtQuick.Layouts 1.1
-import QtQuick.Controls 2.1
+import QtQuick.Controls 2.4
 import QtQuick.Controls.Material 2.1
 import QtGraphicalEffects 1.0
 import QtPositioning 5.3
 import QtSensors 5.3
+
+import QtQuick.Window 2.2
 
 import ArcGIS.AppFramework 1.0
 import ArcGIS.AppFramework.Controls 1.0
@@ -102,156 +106,153 @@ App {
 
                 // display callout on mouseClicked
                 onMouseClicked: {
-                    if (callout.calloutVisible)
-                        callout.dismiss()
-                    else
-                    {
-                        calloutLocation = mouse.mapPoint;
+                    // hide the attribute view
+                    attributeView.height = 0;
+
+
+
+                    // show the attribute view
+                    attributeView.height = 200 * scaleFactor
+
+//                    popup.open()
+//                    xCoor = mouse.mapPoint.x.toFixed(2);
+//                    yCoor = mouse.mapPoint.y.toFixed(2);
+
+//                    if (callout.calloutVisible)
+//                        callout.dismiss()
+//                    else
+//                    {
+//                        calloutLocation = mouse.mapPoint;
                         xCoor = mouse.mapPoint.x.toFixed(2);
                         yCoor = mouse.mapPoint.y.toFixed(2);
-                        callout.accessoryButtonHidden = true;
-                        callout.showCallout();
-                        attachmentWindow.visible = true;
-                    }
+//                        callout.accessoryButtonHidden = true;
+//                        callout.showCallout();
+
+//                    }
                 }
             } //end of mapview
-            
-            
-            // weather report popout window
+
             Rectangle {
-                id: attachmentWindow
-                anchors.centerIn: parent
-                height: 200 * scaleFactor
-                width: 250 * scaleFactor
-                visible: false
-                radius: 10
-                color: "lightgrey"
-                border.color: "darkgrey"
-                opacity: 0.90
-                clip: true
-
-                // accept mouse events so they do not propogate down to the map
-                MouseArea {
-                    anchors.fill: parent
-                    onClicked: mouse.accepted = true
-                    onWheel: wheel.accepted = true
-                }
-
-                Rectangle {
-                    id: titleText
-                    anchors {
-                        left: parent.left
-                        right: parent.right
-                        top: parent.top
-                    }
-                    height: 40 * scaleFactor
-                    color: "transparent"
-
-                    Text {
-                        anchors {
-                            verticalCenter: parent.verticalCenter
-                            left: parent.left
-                            margins: 10 * scaleFactor
-                        }
-
-                        text: "Weather"; font {bold: true; pixelSize: 20 * scaleFactor;}
-                    }
-
-                }
-                
-                
-            Rectangle {
-                id: rect
-                anchors.fill: parent
-                visible: autoPanListView.visible
-                color: "black"
-                opacity: 0.7
-            }
-
-            ListView {
-                id: autoPanListView
+                id: attributeView
                 anchors {
+                    left: parent.left
                     right: parent.right
                     bottom: parent.bottom
-                    margins: 10 * scaleFactor
                 }
-                visible: false
-                width: parent.width
-                height: 300 * scaleFactor
-                spacing: 10 * scaleFactor
-                model: ListModel {
-                    id: autoPanListModel
+                height: 0
+
+                // Animate the expand and collapse of the legend
+                Behavior on height {
+                    SpringAnimation {
+                        spring: 3
+                        damping: 0.4
+                    }
                 }
 
-                delegate: Row {
-                    id: autopanRow
-                    anchors.right: parent.right
-                    spacing: 10
+                ListView {
+                    anchors {
+                        fill: parent
+                        margins: 5 * scaleFactor
+                    }
 
-                    Image {
-                        source: image
-                        width: 40 * scaleFactor
-                        height: width
-                        MouseArea {
-                            anchors.fill: parent
-                            // When an item in the list view is clicked
-                            onClicked: {
-                                autopanRow.updateAutoPanMode();
+                    clip: true
+                    model: relatedFeaturesModel
+                    spacing: 5 * scaleFactor
+
+                    // Create delegate to display the attributes
+
+                    delegate: Text {
+
+                           text: day + ": " + weather
+                       }
+
+                    // Create a section to separate features by table
+                    section {
+//                        property: "serviceLayerName"
+
+                        criteria: ViewSection.FullString
+                        labelPositioning: ViewSection.CurrentLabelAtStart | ViewSection.InlineLabels
+                        delegate: Rectangle {
+                            width: app.width
+                            height: 20 * scaleFactor
+                            color: "#8f499c"
+
+                            Label {
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                text: "x: " + xCoor + " y: " + yCoor
+                                font {
+                                    bold: true
+                                    pixelSize: 13 * scaleFactor
+                                }
+                                elide: Text.ElideRight
+                                clip: true
+                                color: "white"
                             }
                         }
                     }
-
-                    // set the appropriate auto pan mode
-                    function updateAutoPanMode() {
-                        currentAction.visible = true;
-                        autoPanListView.visible = false;
-                    }
                 }
             }
 
-            Row {
-                id: currentAction
-                anchors {
-                    right: parent.right
-                    bottom: parent.bottom
-                    margins: 25 * scaleFactor
-                }
-                spacing: 10
-
-                Text {
-                    text: currentModeText
-                    font.pixelSize: 25 * scaleFactor
-                    color: "white"
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: {
-                            currentAction.visible = false;
-                            autoPanListView.visible = true;
-                        }
-                    }
-                }
-
-                Image {
-                    source: currentModeImage
-                    width: 40 * scaleFactor
-                    height: width
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: {
-                            currentAction.visible = false;
-                            autoPanListView.visible = true;
-                        }
-                    }
-                }
+            ListModel {
+                id: relatedFeaturesModel
+                ListElement {
+                      day: "Monday"
+                      weather: "82  89"
+                  }
+                  ListElement {
+                      day: "Tuesday"
+                      weather: "82  89"
+                  }
+                  ListElement {
+                      day: "Wednesday"
+                      weather: "82  89"
+                  }
+                  ListElement {
+                      day: "Thursday"
+                      weather: "82  89"
+                  }
+                  ListElement {
+                      day: "Friday"
+                      weather: "82  89"
+                  }
+                  ListElement {
+                      day: "Saturday"
+                      weather: "82  89"
+                  }
+                  ListElement {
+                      day: "Sunday"
+                      weather: "82  89"
+                  }
             }
-        }
-    }
+
+
+//            Popup {
+//                    id: popup
+//                    x: 100
+//                    y: 100
+//                    width: 200
+//                    height: 300
+//                    modal: true
+//                    focus: true
+//                    closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutsideParent
+//                    font.family: "Courier"
+
+//                       Column {
+//                           Label {
+//                               text: qsTr("This will use Courier...")
+//                           }
+//                }
+//            }
+
+
+        } //end of big Rectangle
+    } //end of Page
 
     //ends here ------------------------------------------------------------------------
     Controls.DescriptionPage{
         id:descPage
         visible: false
     }
-}
+} //end of App
 
 
