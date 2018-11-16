@@ -106,29 +106,20 @@ App {
 
                 // display callout on mouseClicked
                 onMouseClicked: {
-                    // hide the attribute view
-                    attributeView.height = 0;
-
-
-
                     // show the attribute view
                     attributeView.height = 200 * scaleFactor
 
-//                    popup.open()
-//                    xCoor = mouse.mapPoint.x.toFixed(2);
-//                    yCoor = mouse.mapPoint.y.toFixed(2);
-
-//                    if (callout.calloutVisible)
-//                        callout.dismiss()
-//                    else
-//                    {
-//                        calloutLocation = mouse.mapPoint;
+                    if (callout.calloutVisible)
+                        callout.dismiss()
+                    else
+                    {
+                        calloutLocation = mouse.mapPoint;
                         xCoor = mouse.mapPoint.x.toFixed(2);
                         yCoor = mouse.mapPoint.y.toFixed(2);
-//                        callout.accessoryButtonHidden = true;
-//                        callout.showCallout();
+                        callout.accessoryButtonHidden = true;
+                        callout.showCallout();
 
-//                    }
+                    }
                 }
             } //end of mapview
 
@@ -161,17 +152,7 @@ App {
 
                     // Create delegate to display the attributes
 
-                    delegate: Text {
 
-                           text: day + ": " + weather
-                       }
-
-                    // Create a section to separate features by table
-                    section {
-//                        property: "serviceLayerName"
-
-                        criteria: ViewSection.FullString
-                        labelPositioning: ViewSection.CurrentLabelAtStart | ViewSection.InlineLabels
                         delegate: Rectangle {
                             width: app.width
                             height: 20 * scaleFactor
@@ -179,7 +160,7 @@ App {
 
                             Label {
                                 anchors.horizontalCenter: parent.horizontalCenter
-                                text: "x: " + xCoor + " y: " + yCoor
+                                text: day + ": " + weather
                                 font {
                                     bold: true
                                     pixelSize: 13 * scaleFactor
@@ -187,9 +168,10 @@ App {
                                 elide: Text.ElideRight
                                 clip: true
                                 color: "white"
+
                             }
                         }
-                    }
+
                 }
             }
 
@@ -224,25 +206,6 @@ App {
                       weather: "82  89"
                   }
             }
-
-
-//            Popup {
-//                    id: popup
-//                    x: 100
-//                    y: 100
-//                    width: 200
-//                    height: 300
-//                    modal: true
-//                    focus: true
-//                    closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutsideParent
-//                    font.family: "Courier"
-
-//                       Column {
-//                           Label {
-//                               text: qsTr("This will use Courier...")
-//                           }
-//                }
-//            }
 
 
         } //end of big Rectangle
